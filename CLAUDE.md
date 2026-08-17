@@ -23,9 +23,12 @@ plugins/<name>/
   `debugger`. Enabled everywhere.
 - **binacode-laravel-api** — API-first Laravel + Laravel Data + React Query.
   3 agents, 3 skills, 2 hooks, authorization scaffold.
+- **binacode-laravel-inertia** — classic Inertia, props carry domain data,
+  no separate JSON API. 3 agents, 3 skills, 2 hooks, authorization scaffold.
+  Do not enable alongside `binacode-laravel-api` — both ship a `code-reviewer`
+  with contradictory rules.
 
-Planned: `binacode-laravel-inertia` (classic Inertia, props carry data),
-`binacode-react` (standalone React, no PHP).
+Planned: `binacode-react` (standalone React, no PHP).
 
 ## Rules for changing this repo
 

@@ -11,6 +11,11 @@
       "name": "binacode-laravel-api",
       "source": "./plugins/binacode-laravel-api",
       "description": "API-first Laravel: Laravel Data, JSON endpoints, Inertia page shell only, React Query. Ships review and audit agents plus quality hooks."
+    },
+    {
+      "name": "binacode-laravel-inertia",
+      "source": "./plugins/binacode-laravel-inertia",
+      "description": "Classic Laravel Inertia: controllers render pages, domain data travels in props, no separate JSON API. Ships review and audit agents plus quality hooks."
     }
   ]
 }

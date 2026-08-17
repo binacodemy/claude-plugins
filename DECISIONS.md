@@ -117,13 +117,77 @@ These were written from secondary sources, not the official reference:
 5. The optional `type: "agent"` Stop hook documented in the laravel-api
    plugin's hooks README is experimental.
 
-## Roadmap
+## The Inertia-props content
 
-**binacode-laravel-inertia** — classic Inertia where props carry domain data.
-Start from `binacode-laravel-api/agents/code-reviewer.md`, strip the API and
-React Query sections, restore prop-leakage and deferred-props material. Keep
-`migrations` (identical). Drop `api-contract`, replace with a props-contract
-skill. Hooks can be reused as-is.
+**binacode-laravel-inertia is built.** Forked from
+`binacode-laravel-api/agents/code-reviewer.md` per the original roadmap
+entry: stripped the API-endpoint and React Query sections, kept the
+Laravel-Data material (props are commonly Data-object-shaped even without a
+JSON API), and wrote prop-leakage and deferred/lazy-prop material fresh —
+there was no prior version to restore it from, despite how the original plan
+note read.
+
+**"Two doors" becomes "one door."** The API plugin's authorization framing
+(page controller vs. API endpoint, only the second matters) doesn't apply
+here — there is one controller and it always runs. Re-centered on: everything
+in a prop ships to the client regardless of what the UI renders (the same
+trust-boundary shift `#[Hidden]` gets flagged for in the API plugin), and a
+`lazy`/`defer` prop closure must still run its authorization check when
+evaluated, not just on initial render.
+
+**`api-contract` became `props-contract`, not a rename.** The hard rule
+inverts: the API plugin's skill forbids domain data in Inertia props, this
+one's skill exists because domain data in props is correct here. Keeping one
+skill and parameterizing it would have made the file self-contradictory.
+
+**Hooks, `migrations`, `settings.json`, and `EnsureRequestWasAuthorized.php`
+were reused byte-for-byte.** None of them reference the API/React Query
+split — the Stop-hook quality gate, the migration rules, and the "no
+successful response without an authorization check" middleware are true
+regardless of how props reach the client. Only the route-coverage test and
+its README changed, because the API version filters routes by an `api/`
+prefix that doesn't exist in a classic Inertia app; the replacement checks
+for `auth` middleware on every GET route instead and says plainly that it
+cannot catch a missing ownership check inside an authenticated action.
+
+**Unverified like the rest of this plugin's family:** `init-project.php` has
+not been run against a real Inertia project.
+
+**Building it surfaced three bugs that were already live in
+binacode-laravel-api, fixed in both at once (0.1.0 → 0.1.1 for the API
+plugin) rather than only in the new copy:**
+1. `init-project.php`'s overwrite guard checked for a label string
+   (`'The one thing a new developer'`) present in every generated file
+   whether or not it was filled in, so it never actually refused to
+   overwrite a hand-edited `CLAUDE.md`. Fixed to check for `'...>'` instead —
+   every unfilled Conventions placeholder is wrapped in `<... | ...>`, so
+   that substring's absence is what "a human filled this in" actually means.
+2. `quality-gate.sh`'s `CHANGED` list came only from `git diff` and
+   `git diff --cached`, so a new file that was never `git add`ed — the
+   normal state right after `Write` — was invisible to the gate, including
+   the type-freshness check. Added `git ls-files --others --exclude-standard`
+   to the union.
+3. Both route-coverage tests rejected a route as "guarded" on
+   `str_contains($middleware, 'auth')`, which a middleware alias like
+   `author` (checks post authorship, not login) would false-positive.
+   Tightened to an exact match on `auth` or a `auth:` prefix.
+
+Chose to fix both plugins rather than the new one only, specifically because
+the five files above are otherwise kept byte-identical on purpose — patching
+one copy and not the other would have created drift immediately.
+
+**Considered moving those five identical files into binacode-core, decided
+not to yet.** Nothing in `quality-gate.sh`, `format-file.sh`, `settings.json`,
+`EnsureRequestWasAuthorized.php`, or `migrations/SKILL.md` is API- or
+Inertia-specific, so `binacode-core` is where they arguably belong per this
+file's own "shared components live in binacode-core, never duplicated" rule.
+Left them duplicated for now because there's only one real consumer of the
+duplication risk today (these two plugins are never both enabled on the same
+project — see the mutual-exclusion note in each README) — revisit when
+`binacode-react` needs the same files and a third copy would otherwise
+appear, per "prune after real use" below.
+
+## Roadmap
 
 **binacode-react** — standalone React. No PHP, so `bin/*.sh` need a different
 marker file (`package.json` plus absence of `artisan`) and the transform step

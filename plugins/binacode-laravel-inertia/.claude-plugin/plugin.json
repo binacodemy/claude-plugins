@@ -1,0 +1,7 @@
+{
+  "name": "binacode-laravel-inertia",
+  "version": "0.1.0",
+  "description": "Classic Laravel Inertia where props carry domain data. Review and security agents, props-contract rules, and quality hooks.",
+  "author": { "name": "Binacode" },
+  "license": "MIT"
+}
