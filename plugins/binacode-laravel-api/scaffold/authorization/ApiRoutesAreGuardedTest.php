@@ -12,7 +12,7 @@ it('guards every api route', function () {
     $unguarded = collect(Route::getRoutes())
         ->filter(fn ($r) => str_starts_with($r->uri(), 'api/'))
         ->reject(fn ($r) => collect($r->gatherMiddleware())
-            ->contains(fn ($m) => is_string($m) && str_contains($m, 'auth')))
+            ->contains(fn ($m) => is_string($m) && ($m === 'auth' || str_starts_with($m, 'auth:'))))
         ->reject(fn ($r) => in_array($r->getName(), $allowed, true))
         ->map->uri()
         ->values();

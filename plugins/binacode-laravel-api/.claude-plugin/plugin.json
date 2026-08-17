@@ -1,6 +1,6 @@
 {
   "name": "binacode-laravel-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "API-first Laravel with Laravel Data, Inertia page shells, and React Query. Review and security agents, contract rules, and quality hooks.",
   "author": { "name": "Binacode" },
   "license": "MIT"

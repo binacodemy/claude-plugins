@@ -12,7 +12,11 @@ if (! file_exists('artisan')) {
 
 $target = '.claude/CLAUDE.md';
 
-if (file_exists($target) && ! str_contains(file_get_contents($target), 'The one thing a new developer')) {
+// Every Conventions placeholder is wrapped in `<... | ...>` or bare `<...>`,
+// so '...>' surviving means at least one line is still unfilled. Once a human
+// has replaced every placeholder, that marker is gone and re-running init
+// must not clobber their answers.
+if (file_exists($target) && ! str_contains(file_get_contents($target), '...>')) {
     fwrite(STDERR, "$target looks hand-edited — refusing to overwrite it.\n");
     exit(1);
 }

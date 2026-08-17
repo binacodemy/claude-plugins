@@ -7,7 +7,7 @@ INPUT=$(cat)
 ACTIVE=$(printf '%s' "$INPUT" | php -r '$i=json_decode(stream_get_contents(STDIN),true) ?: []; echo empty($i["stop_hook_active"]) ? "0" : "1";' 2>/dev/null)
 [ "$ACTIVE" = "1" ] && exit 0
 
-CHANGED=$( { git diff --name-only --diff-filter=d 2>/dev/null; git diff --cached --name-only --diff-filter=d 2>/dev/null; } | sort -u )
+CHANGED=$( { git diff --name-only --diff-filter=d 2>/dev/null; git diff --cached --name-only --diff-filter=d 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null; } | sort -u )
 [ -z "$CHANGED" ] && exit 0
 PHP_FILES=$(printf '%s\n' "$CHANGED" | grep -E '\.php$'          | grep -v '^vendor/'       || true)
 TS_FILES=$(printf  '%s\n' "$CHANGED" | grep -E '\.(ts|tsx|jsx)$' | grep -v '^node_modules/' || true)
