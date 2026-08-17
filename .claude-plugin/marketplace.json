@@ -1,0 +1,16 @@
+{
+  "name": "binacode",
+  "owner": { "name": "Binacode" },
+  "plugins": [
+    {
+      "name": "binacode-core",
+      "source": "./plugins/binacode-core",
+      "description": "Stack-agnostic workflow: /commit, /pr, /upgrade-deps, and a debugger agent. Enable everywhere; pair with one stack plugin."
+    },
+    {
+      "name": "binacode-laravel-api",
+      "source": "./plugins/binacode-laravel-api",
+      "description": "API-first Laravel: Laravel Data, JSON endpoints, Inertia page shell only, React Query. Ships review and audit agents plus quality hooks."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan test:*)", "Bash(php artisan route:list:*)",
+      "Bash(php artisan about:*)", "Bash(php artisan migrate:status:*)",
+      "Bash(php artisan migrate --pretend:*)",
+      "Bash(php artisan typescript:transform:*)",
+      "Bash(./vendor/bin/pest:*)", "Bash(./vendor/bin/phpunit:*)",
+      "Bash(./vendor/bin/pint:*)", "Bash(./vendor/bin/phpstan:*)",
+      "Bash(composer install:*)", "Bash(composer dump-autoload:*)",
+      "Bash(npm run build:*)", "Bash(npm run lint:*)", "Bash(npm run typecheck:*)",
+      "Bash(./node_modules/.bin/tsc --noEmit:*)",
+      "Bash(./node_modules/.bin/eslint:*)",
+      "Bash(./node_modules/.bin/vitest run:*)"
+    ],
+    "deny": [
+      "Bash(php artisan migrate:fresh:*)", "Bash(php artisan migrate:reset:*)",
+      "Bash(php artisan db:wipe:*)", "Bash(php artisan tinker:*)",
+      "Bash(npm run dev:*)",
+      "Read(./.env)", "Read(./.env.*)", "Read(./storage/logs/**)"
+    ]
+  }
+}

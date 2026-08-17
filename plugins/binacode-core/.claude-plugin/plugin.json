@@ -1,0 +1,7 @@
+{
+  "name": "binacode-core",
+  "version": "0.1.0",
+  "description": "Stack-agnostic development workflow: commit, pull request, and dependency upgrade skills, plus a debugging agent.",
+  "author": { "name": "Binacode" },
+  "license": "MIT"
+}
