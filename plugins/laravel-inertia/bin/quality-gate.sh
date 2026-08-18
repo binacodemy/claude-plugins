@@ -27,12 +27,63 @@ if [ -n "$DATA_FILES" ] && grep -q "spatie/laravel-typescript-transformer" compo
 fi
 
 if [ -n "$PHP_FILES" ]; then
-  [ -x ./vendor/bin/pint ]    && { OUT=$(echo "$PHP_FILES" | xargs ./vendor/bin/pint --test 2>&1) || add pint "$OUT"; }
-  [ -x ./vendor/bin/phpstan ] && { OUT=$(echo "$PHP_FILES" | xargs ./vendor/bin/phpstan analyse --no-progress --error-format=raw 2>&1) || add phpstan "$OUT"; }
+  [ -x ./vendor/bin/pint ] && { OUT=$(printf '%s\n' "$PHP_FILES" | tr '\n' '\0' | xargs -0 ./vendor/bin/pint --test 2>&1) || add pint "$OUT"; }
+
+  # PHPStan paths on the CLI override phpstan.neon's `paths:` — analysing
+  # every changed file (not just app/) would surface pre-existing errors in
+  # tests/, database/, etc. that the project never asked to be checked.
+  # Restrict to whatever phpstan.neon actually declares (default: app/).
+  # NOTE: only reads paths: from the top-level config file, not from an
+  # `includes:` chain. That under-scopes rather than over-scopes (falls
+  # through to the app/ default below), which is the safe direction for a
+  # gate that can only block — never widen what gets analysed.
+  if [ -x ./vendor/bin/phpstan ]; then
+    STAN_FILES=$(printf '%s\n' "$PHP_FILES" | php -r '
+      $norm = function ($p) {
+          if (preg_match("/^([\x27\"])(.*)\\1\$/", $p, $qm)) { $p = $qm[2]; }   // drop a matching quote pair
+          $p = preg_replace("#^%currentWorkingDirectory%/#", "", $p);
+          $p = preg_replace("#^\./#", "", $p, 1);                              // strip one leading ./, not a run of ./ chars
+          return rtrim($p, "/");
+      };
+      $roots = [];
+      // same candidate filenames/order as init-project.php:52 — keep both in sync
+      foreach (["phpstan.neon", "phpstan.neon.dist", "phpstan.dist.neon"] as $f) {
+          if (!is_file($f)) continue;
+          $inPaths = false;
+          foreach (file($f) as $line) {
+              $line = rtrim($line, "\r\n");
+              if (!$inPaths && preg_match("/^\s*paths\s*:\s*(.*)\$/", $line, $pm)) {
+                  $rest = trim(preg_replace("/(^|\s)#.*\$/", "", $pm[1]));     // strip an inline comment first, then trim
+                  if ($rest === "") { $inPaths = true; continue; }             // block style: list follows
+                  if (preg_match("/^\[(.*)\]\$/", $rest, $fm)) {               // flow style: paths: [app, tests]
+                      foreach (explode(",", $fm[1]) as $item) {
+                          $item = trim($item);
+                          if ($item !== "") $roots[] = $norm($item);
+                      }
+                  }
+                  break;
+              }
+              if ($inPaths) {
+                  if (preg_match("/^\s*-\s*(\S+)/", $line, $m)) { $roots[] = $norm($m[1]); continue; }
+                  break;
+              }
+          }
+          break;
+      }
+      if (!$roots) $roots = ["app"];   // no config, or no paths: key -> Larastan default
+      foreach (explode("\n", trim(stream_get_contents(STDIN))) as $file) {
+          if ($file === "") continue;
+          foreach ($roots as $r) {
+              if ($r !== "" && ($file === $r || strpos($file, $r."/") === 0)) { echo $file, "\n"; break; }
+          }
+      }
+    ' 2>/dev/null)
+    [ -n "$STAN_FILES" ] && { OUT=$(printf '%s\n' "$STAN_FILES" | tr '\n' '\0' | xargs -0 ./vendor/bin/phpstan analyse --no-progress --error-format=raw 2>&1) || add phpstan "$OUT"; }
+  fi
 fi
 if [ -n "$TS_FILES" ]; then
   [ -x ./node_modules/.bin/tsc ]    && { OUT=$(./node_modules/.bin/tsc --noEmit 2>&1) || add tsc "$OUT"; }
-  [ -x ./node_modules/.bin/eslint ] && { OUT=$(echo "$TS_FILES" | xargs ./node_modules/.bin/eslint 2>&1) || add eslint "$OUT"; }
+  [ -x ./node_modules/.bin/eslint ] && { OUT=$(printf '%s\n' "$TS_FILES" | tr '\n' '\0' | xargs -0 ./node_modules/.bin/eslint 2>&1) || add eslint "$OUT"; }
 fi
 
 [ -n "$FAILED" ] && { echo "Quality gate failed. Fix these before finishing:${FAILED}" >&2; exit 2; }

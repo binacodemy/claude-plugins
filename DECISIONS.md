@@ -67,6 +67,18 @@ most common hook bug; if a gate seems to do nothing, check this first.
 takes 30–60s and would run every time Claude finishes a turn. Scoped analysis
 misses cross-file errors elsewhere — that is what `@test-runner` is for.
 
+**PHPStan's scope is changed files *intersected with* `phpstan.neon`'s
+`paths:`.** Paths passed on the PHPStan CLI override `parameters.paths` in the
+config, so blindly handing it every changed `.php` file analyses code the
+project never configured for analysis — `tests/` is the usual victim, since a
+stock Larastan config only lists `app/`, and the resulting errors have no
+baseline and can't be fixed from within scope. `quality-gate.sh` reads
+`phpstan.neon`'s `paths:` itself and filters to that (defaulting to `app/` if
+no config or no `paths:` key is found) rather than editing the user's
+`phpstan.neon` to add `tests/` — widening the project's own analysis surface
+is not this hook's call to make, and doing so would surface that same wall of
+pre-existing errors immediately.
+
 **`stop_hook_active` guard is mandatory.** Without it, a gate that keeps
 failing traps Claude in an infinite stop loop.
 

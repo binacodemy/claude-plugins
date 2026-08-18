@@ -1,6 +1,6 @@
 {
   "name": "laravel-inertia",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Classic Laravel Inertia where props carry domain data. Review and security agents, props-contract rules, and quality hooks.",
   "author": { "name": "Binacode" },
   "license": "MIT"
