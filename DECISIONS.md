@@ -6,10 +6,10 @@ were tried the other way first.
 ## Architecture
 
 **Core + stack plugins, not one big plugin.**
-Plugin components are namespaced (`binacode-laravel-api:code-reviewer`) and
+Plugin components are namespaced (`laravel-api:code-reviewer`) and
 plugin scope is the *lowest* priority. They do not override same-named agents
 from user or project scope — they coexist and compete for routing. So anything
-stack-agnostic lives in `binacode-core` once, and stack plugins ship only what
+stack-agnostic lives in `core` once, and stack plugins ship only what
 is genuinely stack-specific. Enable core globally, stack plugins per project.
 
 **Users must delete old user-level copies.**
@@ -119,8 +119,8 @@ These were written from secondary sources, not the official reference:
 
 ## The Inertia-props content
 
-**binacode-laravel-inertia is built.** Forked from
-`binacode-laravel-api/agents/code-reviewer.md` per the original roadmap
+**laravel-inertia is built.** Forked from
+`laravel-api/agents/code-reviewer.md` per the original roadmap
 entry: stripped the API-endpoint and React Query sections, kept the
 Laravel-Data material (props are commonly Data-object-shaped even without a
 JSON API), and wrote prop-leakage and deferred/lazy-prop material fresh —
@@ -154,7 +154,7 @@ cannot catch a missing ownership check inside an authenticated action.
 not been run against a real Inertia project.
 
 **Building it surfaced three bugs that were already live in
-binacode-laravel-api, fixed in both at once (0.1.0 → 0.1.1 for the API
+laravel-api, fixed in both at once (0.1.0 → 0.1.1 for the API
 plugin) rather than only in the new copy:**
 1. `init-project.php`'s overwrite guard checked for a label string
    (`'The one thing a new developer'`) present in every generated file
@@ -176,20 +176,35 @@ Chose to fix both plugins rather than the new one only, specifically because
 the five files above are otherwise kept byte-identical on purpose — patching
 one copy and not the other would have created drift immediately.
 
-**Considered moving those five identical files into binacode-core, decided
+**Considered moving those five identical files into core, decided
 not to yet.** Nothing in `quality-gate.sh`, `format-file.sh`, `settings.json`,
 `EnsureRequestWasAuthorized.php`, or `migrations/SKILL.md` is API- or
-Inertia-specific, so `binacode-core` is where they arguably belong per this
-file's own "shared components live in binacode-core, never duplicated" rule.
+Inertia-specific, so `core` is where they arguably belong per this
+file's own "shared components live in core, never duplicated" rule.
 Left them duplicated for now because there's only one real consumer of the
 duplication risk today (these two plugins are never both enabled on the same
 project — see the mutual-exclusion note in each README) — revisit when
-`binacode-react` needs the same files and a third copy would otherwise
+`react` needs the same files and a third copy would otherwise
 appear, per "prune after real use" below.
+
+## Naming
+
+**Plugins dropped the `binacode-` prefix (`binacode-laravel-api` →
+`laravel-api`, etc.), version 0.1.x → 0.2.0 across all three.** Claude Code
+namespaces every plugin agent as `<plugin-name>:<agent-name>` in the
+@-mention picker — this is fixed, not configurable via agent frontmatter or
+`plugin.json` (confirmed against the Claude Code docs before making this
+change). With the old names that produced
+`@"binacode-laravel-api:code-reviewer (agent)"`, which is what the plugin
+name directly controls, so the plugin name is where the fix has to live —
+the marketplace's own `name: "binacode"` stays as-is since it doesn't feed
+the agent-mention prefix. Users on the old names must reinstall
+(`/plugin marketplace update`, then reinstall each plugin under its new
+name) — same-repo-source reinstall, no data migration involved.
 
 ## Roadmap
 
-**binacode-react** — standalone React. No PHP, so `bin/*.sh` need a different
+**react** — standalone React. No PHP, so `bin/*.sh` need a different
 marker file (`package.json` plus absence of `artisan`) and the transform step
 drops out entirely.
 

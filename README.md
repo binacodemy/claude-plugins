@@ -7,26 +7,26 @@ stack, plus a shared core.
 
 ```
 /plugin marketplace add binacode/claude-plugins        # or ./binacode locally
-/plugin install binacode-core@binacode
-/plugin install binacode-laravel-api@binacode
+/plugin install core@binacode
+/plugin install laravel-api@binacode        # or laravel-inertia@binacode — not both
 ```
 
 Per project instead of globally:
 
 ```
-claude plugin install binacode-laravel-api@binacode --scope project
+claude plugin install laravel-api@binacode --scope project
 ```
 
 ## Plugins
 
 | Plugin | For | Ships |
 |---|---|---|
-| `binacode-core` | Everything | `/commit`, `/pr`, `/upgrade-deps`, `debugger` agent |
-| `binacode-laravel-api` | API-first Laravel + Laravel Data + React Query | 3 agents, `api-contract` + `migrations` + `init` skills, format and quality-gate hooks, authorization scaffold |
-| `binacode-laravel-inertia` | *planned* — classic Inertia, props carry data | reviewer tuned to the props seam, no API layer rules |
-| `binacode-react` | *planned* — standalone React apps | frontend agents and hooks, no PHP |
+| `core` | Everything | `/commit`, `/pr`, `/upgrade-deps`, `debugger` agent |
+| `laravel-api` | API-first Laravel + Laravel Data + React Query | 3 agents, `api-contract` + `migrations` + `init` skills, format and quality-gate hooks, authorization scaffold |
+| `laravel-inertia` | Classic Inertia, props carry domain data, no separate JSON API | 3 agents, `props-contract` + `migrations` + `init` skills, format and quality-gate hooks, authorization scaffold |
+| `react` | *planned* — standalone React apps | frontend agents and hooks, no PHP |
 
-`binacode-core` is designed to be enabled everywhere. Everything stack-specific
+`core` is designed to be enabled everywhere. Everything stack-specific
 lives in exactly one stack plugin.
 
 ## Enable one stack plugin per project
@@ -34,10 +34,12 @@ lives in exactly one stack plugin.
 Stack plugins each ship a `code-reviewer`. Enabling two in the same project
 gives you two reviewers competing for the same routing, and Claude has to guess
 which one you meant. Install stack plugins with `--scope project`, or keep one
-enabled globally if you only work in one stack.
+enabled globally if you only work in one stack. In particular, `laravel-api`
+and `laravel-inertia` are mutually exclusive — never enable both on the same
+project.
 
-Component names are namespaced by plugin: `@binacode-laravel-api:code-reviewer`,
-`/binacode-core:commit`. The bare `/commit` also resolves unless another
+Component names are namespaced by plugin: `@laravel-api:code-reviewer`,
+`/core:commit`. The bare `/commit` also resolves unless another
 command already uses that name.
 
 ## If you previously used the shell installers
@@ -59,7 +61,7 @@ the plugin entirely.
 
 ## Adding a stack plugin
 
-Copy `plugins/binacode-laravel-api` as a starting point, rename it, and add an
+Copy `plugins/laravel-api` as a starting point, rename it, and add an
 entry to `.claude-plugin/marketplace.json`. Keep shared workflow skills in
-`binacode-core` rather than duplicating them — that is the whole reason core
+`core` rather than duplicating them — that is the whole reason core
 exists.

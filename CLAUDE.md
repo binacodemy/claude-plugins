@@ -19,20 +19,20 @@ plugins/<name>/
 
 ## Current plugins
 
-- **binacode-core** — stack-agnostic: `/commit`, `/pr`, `/upgrade-deps`,
+- **core** — stack-agnostic: `/commit`, `/pr`, `/upgrade-deps`,
   `debugger`. Enabled everywhere.
-- **binacode-laravel-api** — API-first Laravel + Laravel Data + React Query.
+- **laravel-api** — API-first Laravel + Laravel Data + React Query.
   3 agents, 3 skills, 2 hooks, authorization scaffold.
-- **binacode-laravel-inertia** — classic Inertia, props carry domain data,
+- **laravel-inertia** — classic Inertia, props carry domain data,
   no separate JSON API. 3 agents, 3 skills, 2 hooks, authorization scaffold.
-  Do not enable alongside `binacode-laravel-api` — both ship a `code-reviewer`
+  Do not enable alongside `laravel-api` — both ship a `code-reviewer`
   with contradictory rules.
 
-Planned: `binacode-react` (standalone React, no PHP).
+Planned: `react` (standalone React, no PHP).
 
 ## Rules for changing this repo
 
-- **Shared components live in binacode-core, never duplicated.** Two stack
+- **Shared components live in core, never duplicated.** Two stack
   plugins each shipping a `code-reviewer` means two competing descriptions
   when both are enabled.
 - **One `code-reviewer` per stack plugin.** Adding a second reviewer-ish agent

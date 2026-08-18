@@ -3,18 +3,18 @@
   "owner": { "name": "Binacode" },
   "plugins": [
     {
-      "name": "binacode-core",
-      "source": "./plugins/binacode-core",
+      "name": "core",
+      "source": "./plugins/core",
       "description": "Stack-agnostic workflow: /commit, /pr, /upgrade-deps, and a debugger agent. Enable everywhere; pair with one stack plugin."
     },
     {
-      "name": "binacode-laravel-api",
-      "source": "./plugins/binacode-laravel-api",
+      "name": "laravel-api",
+      "source": "./plugins/laravel-api",
       "description": "API-first Laravel: Laravel Data, JSON endpoints, Inertia page shell only, React Query. Ships review and audit agents plus quality hooks."
     },
     {
-      "name": "binacode-laravel-inertia",
-      "source": "./plugins/binacode-laravel-inertia",
+      "name": "laravel-inertia",
+      "source": "./plugins/laravel-inertia",
       "description": "Classic Laravel Inertia: controllers render pages, domain data travels in props, no separate JSON API. Ships review and audit agents plus quality hooks."
     }
   ]
